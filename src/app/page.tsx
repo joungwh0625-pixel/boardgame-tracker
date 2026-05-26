@@ -35,7 +35,7 @@ export default async function Home() {
   return (
     <>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1 style={{ margin: 0, fontSize: '22px' }}>🎲 대시보드</h1>
+        <h1 style={{ margin: 0, fontSize: '22px' }}>🎲 게임전적 대시보드</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Link href="/mypage" style={{ display: 'block', width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--bg-color)', overflow: 'hidden', border: '2px solid var(--border-color)' }}>
             {myProfile?.avatar_url ? (

@@ -19,9 +19,6 @@ export default async function NewGamePage() {
       <div className="card" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h1 style={{ fontSize: '20px', margin: 0 }}>새 보드게임 등록</h1>
-          <Link href="/admin" style={{ padding: '6px 12px', backgroundColor: 'var(--primary-color)', color: '#fff', borderRadius: '20px', fontSize: '12px', textDecoration: 'none', fontWeight: 'bold' }}>
-            👑 권한 관리
-          </Link>
         </div>
         <form action={addGame}>
           <div className="form-group">

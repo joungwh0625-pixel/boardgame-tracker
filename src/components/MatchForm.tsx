@@ -112,7 +112,7 @@ export default function MatchForm({ games, profiles, message }: { games: any[], 
           )}
         </div>
 
-        <button className="btn btn-primary" type="submit">기보 저장하기</button>
+        <button className="btn btn-primary" type="submit">저장하기</button>
       </form>
     </div>
   )

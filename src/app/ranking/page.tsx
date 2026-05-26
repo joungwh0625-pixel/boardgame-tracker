@@ -12,43 +12,23 @@ export default async function RankingPage() {
     redirect('/login')
   }
 
-  // Fetch all profiles
+  // Fetch all profiles sorted by bodong descending
   const { data: profiles } = await supabase.from('profiles')
     .select('id, display_name, username, avatar_url, bodong')
+    .order('bodong', { ascending: false, nullsFirst: false })
+    .order('display_name', { ascending: true })
 
-  // Fetch all match results
-  const { data: allResults } = await supabase.from('match_results').select(`
-    match_id, is_winner, user_id,
-    matches!inner(status)
-  `).eq('matches.status', 'approved')
-
-  // Pre-calculate participants per match to identify solo plays
-  const participantsPerMatch: Record<string, number> = {}
-  allResults?.forEach((r: any) => {
-    participantsPerMatch[r.match_id] = (participantsPerMatch[r.match_id] || 0) + 1
-  })
-
-  // Calculate stats for each profile
-  const userStats: Record<string, { profile: any, total: number, wins: number }> = {}
-  profiles?.forEach(p => {
-    userStats[p.id] = { profile: p, total: 0, wins: 0 }
-  })
-
-  allResults?.forEach((r: any) => {
-    const isSolo = participantsPerMatch[r.match_id] === 1
-    if (isSolo) return // Skip solo plays
-
-    if (userStats[r.user_id]) {
-      userStats[r.user_id].total += 1
-      if (r.is_winner) userStats[r.user_id].wins += 1
+  // Calculate ranks handling ties
+  let currentRank = 0;
+  let previousBodong = -1;
+  const leaderboard = profiles?.map((p, index) => {
+    const bodong = p.bodong || 0;
+    if (index === 0 || bodong !== previousBodong) {
+      currentRank = index + 1;
+      previousBodong = bodong;
     }
-  })
-
-  // Sort: 1st by wins DESC, 2nd by total games ASC
-  const leaderboard = Object.values(userStats)
-    .sort((a, b) => b.wins - a.wins || a.total - b.total)
-    // Only show users with at least 1 game
-    .filter(stat => stat.total > 0)
+    return { profile: p, bodong, rank: currentRank };
+  }) || [];
 
   return (
     <>
@@ -68,10 +48,10 @@ export default async function RankingPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ 
                       width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                      backgroundColor: idx === 0 ? '#fbbf24' : idx === 1 ? '#94a3b8' : idx === 2 ? '#b45309' : 'var(--border-color)',
-                      color: idx < 3 ? 'white' : 'var(--text-muted)', fontWeight: 'bold', fontSize: '14px'
+                      backgroundColor: stat.rank === 1 ? '#fbbf24' : stat.rank === 2 ? '#94a3b8' : stat.rank === 3 ? '#b45309' : 'var(--border-color)',
+                      color: stat.rank <= 3 ? 'white' : 'var(--text-muted)', fontWeight: 'bold', fontSize: '14px'
                     }}>
-                      {idx + 1}
+                      {stat.rank}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--border-color)', overflow: 'hidden' }}>
@@ -87,8 +67,8 @@ export default async function RankingPage() {
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 'bold', color: 'var(--primary-color)', fontSize: '16px' }}>
-                      {stat.total}전 {stat.wins}승 {stat.total - stat.wins}패
+                    <div style={{ fontWeight: 'bold', color: '#fbbf24', fontSize: '18px' }}>
+                      {stat.bodong.toLocaleString()} <span style={{ fontSize: '14px', color: 'var(--text-main)' }}>보동</span>
                     </div>
                   </div>
                 </li>
