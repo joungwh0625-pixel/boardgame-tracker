@@ -59,7 +59,7 @@ export default function DashboardClient({ games, matches, allResults, myUserId, 
   })
 
   const selectedGameName = selectedGameId ? games?.find((g: any) => g.id === selectedGameId)?.title : null;
-  const leaderboardTitle = selectedGameName ? `실시간 ${selectedGameName} 전적` : '실시간 전체 전적';
+  const leaderboardTitle = selectedGameName ? `최근 ${selectedGameName} 전적` : '최근 전체 전적';
 
   return (
     <>
