@@ -7,7 +7,7 @@ export default function SocialLogins() {
   const [isLoading, setIsLoading] = useState<string | null>(null)
   const supabase = createClient()
 
-  const handleOAuthLogin = async (provider: 'google' | 'kakao') => {
+  const handleOAuthLogin = async (provider: 'google') => {
     try {
       setIsLoading(provider)
       
@@ -15,7 +15,6 @@ export default function SocialLogins() {
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: provider === 'kakao' ? { prompt: 'select_account' } : undefined,
         },
       })
       
@@ -63,32 +62,6 @@ export default function SocialLogins() {
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
         {isLoading === 'google' ? '구글 로그인 중...' : 'Google로 계속하기'}
-      </button>
-
-      <button
-        onClick={() => handleOAuthLogin('kakao')}
-        disabled={isLoading !== null}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '12px',
-          padding: '16px',
-          backgroundColor: '#FEE500',
-          color: '#000000',
-          border: 'none',
-          borderRadius: '12px',
-          fontSize: '16px',
-          fontWeight: 600,
-          cursor: isLoading !== null ? 'not-allowed' : 'pointer',
-          opacity: isLoading === 'kakao' ? 0.7 : 1,
-          transition: 'all 0.2s',
-        }}
-      >
-        <svg viewBox="0 0 24 24" width="24" height="24" style={{ fill: '#000000' }}>
-          <path d="M12 3c-5.52 0-10 3.52-10 7.85 0 2.8 1.83 5.25 4.63 6.64l-1.01 3.7c-.12.44.38.79.76.54l4.31-2.92c.43.05.87.08 1.31.08 5.52 0 10-3.52 10-7.85C22 6.52 17.52 3 12 3z"/>
-        </svg>
-        {isLoading === 'kakao' ? '카카오 로그인 중...' : '카카오로 계속하기'}
       </button>
     </div>
   )
