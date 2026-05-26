@@ -5,6 +5,8 @@ import Link from 'next/link'
 import GameListClient from '@/components/GameListClient'
 import SubmitButton from '@/components/SubmitButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewGamePage() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()

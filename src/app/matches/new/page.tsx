@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import MatchForm from '@/components/MatchForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewMatchPage(props: { searchParams: Promise<{ message: string }> }) {
   const searchParams = await props.searchParams;
   const supabase = await createClient()
