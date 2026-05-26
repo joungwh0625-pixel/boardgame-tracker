@@ -67,7 +67,7 @@ export default async function RankingPage() {
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 'bold', color: '#fbbf24', fontSize: '18px' }}>
+                    <div style={{ fontWeight: 'bold', color: '#fbbf24', fontSize: '18px', whiteSpace: 'nowrap' }}>
                       {stat.bodong.toLocaleString()} <span style={{ fontSize: '14px', color: 'var(--text-main)' }}>보동</span>
                     </div>
                   </div>
