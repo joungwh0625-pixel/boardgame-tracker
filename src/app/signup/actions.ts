@@ -40,8 +40,8 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    console.error(error)
-    redirect(encodeURI('/signup?message=회원가입에 실패했습니다.'))
+    console.error('Signup Error:', error)
+    redirect(encodeURI(`/signup?message=가입실패: ${error.message}`))
   }
 
   redirect(encodeURI('/login?message=회원가입이 완료되었습니다. 로그인해주세요.'))
