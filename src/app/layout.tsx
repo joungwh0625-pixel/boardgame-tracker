@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <NextTopLoader color="#fbbf24" showSpinner={true} height={4} shadow="0 0 10px #fbbf24,0 0 5px #fbbf24" />
+        <NextTopLoader color="#fbbf24" showSpinner={false} height={4} shadow="0 0 10px #fbbf24,0 0 5px #fbbf24" />
         <ServiceWorkerRegister />
         <div className="app-container">
           <div className="content-area">
