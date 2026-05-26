@@ -15,5 +15,5 @@ export default async function NewMatchPage(props: { searchParams: Promise<{ mess
   const { data: games } = await supabase.from('games').select('*').order('title')
   const { data: profiles } = await supabase.from('profiles').select('*').order('display_name')
 
-  return <MatchForm games={games || []} profiles={profiles || []} message={searchParams?.message} />
+  return <MatchForm games={games || []} profiles={profiles || []} message={searchParams?.message} myUserId={user.id} />
 }

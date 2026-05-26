@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { recordMatch } from '@/app/matches/new/actions'
 
-export default function MatchForm({ games, profiles, message }: { games: any[], profiles: any[], message?: string }) {
-  const [selectedPlayers, setSelectedPlayers] = useState<Record<number, string>>({})
+export default function MatchForm({ games, profiles, message, myUserId }: { games: any[], profiles: any[], message?: string, myUserId: string }) {
+  const [selectedPlayers, setSelectedPlayers] = useState<Record<number, string>>({ 1: myUserId })
   const [playerCount, setPlayerCount] = useState(4)
 
   const handlePlayerChange = (num: number, value: string) => {
@@ -61,27 +61,31 @@ export default function MatchForm({ games, profiles, message }: { games: any[], 
             <div key={num} style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: num !== playerCount ? '1px solid var(--border-color)' : 'none' }}>
               <div className="form-group">
                 <label>참여자 {num} {num === 1 ? '(필수)' : '(선택)'}</label>
-                <select 
-                  name={`player_${num}`} 
-                  required={num === 1}
-                  value={selectedPlayers[num] || ''}
-                  onChange={(e) => handlePlayerChange(num, e.target.value)}
-                >
-                  <option value="">{num === 1 ? "선택하세요" : "없음 (선택)"}</option>
-                  {profiles?.map((p: any) => (
-                    <option 
-                      key={p.id} 
-                      value={p.id} 
-                      disabled={isPlayerSelectedByOther(p.id, num)}
-                    >
-                      {p.display_name}({p.username}) {isPlayerSelectedByOther(p.id, num) ? '(선택됨)' : ''}
-                    </option>
-                  ))}
-                  {num > 1 && (
+                {num === 1 ? (
+                  <div style={{ padding: '8px 12px', border: '1px solid var(--border-color)', borderRadius: '8px', backgroundColor: 'var(--bg-color)', color: 'var(--text-muted)' }}>
+                    {profiles?.find(p => p.id === myUserId)?.display_name} ({profiles?.find(p => p.id === myUserId)?.username}) (나)
+                    <input type="hidden" name="player_1" value={myUserId} />
+                  </div>
+                ) : (
+                  <select 
+                    name={`player_${num}`} 
+                    value={selectedPlayers[num] || ''}
+                    onChange={(e) => handlePlayerChange(num, e.target.value)}
+                  >
+                    <option value="">없음 (선택)</option>
+                    {profiles?.map((p: any) => (
+                      <option 
+                        key={p.id} 
+                        value={p.id} 
+                        disabled={isPlayerSelectedByOther(p.id, num)}
+                      >
+                        {p.display_name}({p.username}) {isPlayerSelectedByOther(p.id, num) ? '(선택됨)' : ''}
+                      </option>
+                    ))}
                     <option value="external">직접 입력 (외부 유저)</option>
-                  )}
-                </select>
-                {selectedPlayers[num] === 'external' && (
+                  </select>
+                )}
+                {num > 1 && selectedPlayers[num] === 'external' && (
                   <input 
                     type="text" 
                     name={`external_name_${num}`} 
