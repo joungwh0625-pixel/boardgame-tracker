@@ -32,7 +32,7 @@ export default async function RankingPage() {
 
   return (
     <>
-      <header className="header">
+      <header className="header" style={{ marginBottom: '24px' }}>
         <div>
           <h1 className="title">🏆 보동 랭킹</h1>
           <p className="subtitle">가장 많은 보동 포인트를 모은 유저는 누구일까요?</p>

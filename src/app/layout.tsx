@@ -1,8 +1,7 @@
-import type { Metadata, Viewport } from "next";
-import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import ScrollToTop from "@/components/ScrollToTop";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata: Metadata = {
   title: "Board Game Tracker",
@@ -26,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <NextTopLoader color="#fbbf24" showSpinner={false} height={3} shadow="0 0 10px #fbbf24,0 0 5px #fbbf24" />
         <ServiceWorkerRegister />
         <div className="app-container">
           <div className="content-area">

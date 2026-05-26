@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import GameListClient from '@/components/GameListClient'
+import SubmitButton from '@/components/SubmitButton'
 
 export default async function NewGamePage() {
   const supabase = await createClient()
@@ -33,7 +34,7 @@ export default async function NewGamePage() {
             <label htmlFor="image_file">이미지 첨부 (선택)</label>
             <input id="image_file" name="image_file" type="file" accept="image/*" />
           </div>
-          <button className="btn btn-primary" type="submit">등록하기</button>
+          <SubmitButton defaultText="등록하기" pendingText="등록 중..." />
         </form>
       </div>
 

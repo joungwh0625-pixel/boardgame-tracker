@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { recordMatch } from '@/app/matches/new/actions'
+import SubmitButton from '@/components/SubmitButton'
 
 export default function MatchForm({ games, profiles, message, myUserId }: { games: any[], profiles: any[], message?: string, myUserId: string }) {
   const [selectedPlayers, setSelectedPlayers] = useState<Record<number, string>>({ 1: myUserId })
@@ -129,7 +130,7 @@ export default function MatchForm({ games, profiles, message, myUserId }: { game
           )}
         </div>
 
-        <button className="btn btn-primary" type="submit">저장하기</button>
+        <SubmitButton defaultText="저장하기" pendingText="저장 중..." />
       </form>
     </div>
   )
