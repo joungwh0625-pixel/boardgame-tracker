@@ -30,7 +30,7 @@ export async function recordMatch(formData: FormData) {
     game_id,
     date_played,
     creator_id: user.id,
-    status: isSolo ? 'approved' : 'pending'
+    status: 'approved' // 모든 게임 자동 승인
   }).select().single()
 
   if (matchError || !match) {
@@ -54,8 +54,6 @@ export async function recordMatch(formData: FormData) {
     playersData.push({ user_id, score, is_winner, team })
   }
 
-
-
   for (const p of playersData) {
     results.push({
       match_id: match.id,
@@ -63,7 +61,7 @@ export async function recordMatch(formData: FormData) {
       score: p.score,
       is_winner: isSolo ? false : p.is_winner,
       team: p.team,
-      is_approved: isSolo || p.user_id === user.id // Creator automatically approves
+      is_approved: true // 모든 결과 자동 승인
     })
   }
 
@@ -72,6 +70,15 @@ export async function recordMatch(formData: FormData) {
     if (resultsError) {
       console.error('Error creating results', resultsError)
       redirect(encodeURI('/matches/new?message=결과 저장에 실패했습니다.'))
+    }
+    
+    // Multi-player인 경우 우승자에게 보동 포인트 즉시 지급
+    if (!isSolo) {
+      const winners = results.filter(r => r.is_winner)
+      for (const w of winners) {
+        const { data: p } = await supabase.from('profiles').select('bodong').eq('id', w.user_id).single()
+        await supabase.from('profiles').update({ bodong: (p?.bodong || 0) + 100 }).eq('id', w.user_id)
+      }
     }
   }
 

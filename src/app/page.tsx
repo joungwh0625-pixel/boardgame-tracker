@@ -22,36 +22,7 @@ export default async function Home() {
     )
   `).eq('status', 'approved').order('date_played', { ascending: false }).order('created_at', { ascending: false }).limit(20)
 
-  const { data: pendingMatches } = await supabase.from('matches').select(`
-    id, date_played, created_at, status, creator_id,
-    games(id, title),
-    match_results!inner(
-      score, is_winner, user_id, team, is_approved,
-      profiles(display_name, username)
-    )
-  `).eq('status', 'pending')
-    .eq('match_results.user_id', data.user.id)
-    .order('created_at', { ascending: false })
-    .limit(50)
 
-  // Since the inner join limits the results array to ONLY the current user's result, 
-  // we actually need to fetch the full match_results for these match IDs to display all participants.
-  const pendingMatchIds = pendingMatches?.map(m => m.id) || []
-  let fullPendingMatches: any[] = []
-  
-  if (pendingMatchIds.length > 0) {
-    const { data: fullMatches } = await supabase.from('matches').select(`
-      id, date_played, created_at, status, creator_id,
-      games(id, title),
-      match_results(
-        score, is_winner, user_id, team, is_approved,
-        profiles(display_name, username)
-      )
-    `).in('id', pendingMatchIds).order('created_at', { ascending: false })
-    fullPendingMatches = fullMatches || []
-  }
-
-  const myPendingMatches = fullPendingMatches
 
   const { data: allResults } = await supabase.from('match_results').select(`
     match_id, is_winner, user_id,
@@ -79,7 +50,7 @@ export default async function Home() {
         </div>
       </header>
       
-      <DashboardClient games={games || []} matches={matches || []} pendingMatches={myPendingMatches} allResults={allResults || []} myUserId={data.user.id} isMaster={myProfile?.is_master} />
+      <DashboardClient games={games || []} matches={matches || []} allResults={allResults || []} myUserId={data.user.id} isMaster={myProfile?.is_master} />
     </>
   )
 }

@@ -12,11 +12,43 @@ export default async function RankingPage() {
     redirect('/login')
   }
 
-  // Fetch all profiles sorted by bodong descending
+  // Fetch all profiles
   const { data: profiles } = await supabase.from('profiles')
     .select('id, display_name, username, avatar_url, bodong')
-    .order('bodong', { ascending: false, nullsFirst: false })
-    .order('display_name', { ascending: true })
+
+  // Fetch all match results
+  const { data: allResults } = await supabase.from('match_results').select(`
+    match_id, is_winner, user_id,
+    matches!inner(status)
+  `).eq('matches.status', 'approved')
+
+  // Pre-calculate participants per match to identify solo plays
+  const participantsPerMatch: Record<string, number> = {}
+  allResults?.forEach((r: any) => {
+    participantsPerMatch[r.match_id] = (participantsPerMatch[r.match_id] || 0) + 1
+  })
+
+  // Calculate stats for each profile
+  const userStats: Record<string, { profile: any, total: number, wins: number }> = {}
+  profiles?.forEach(p => {
+    userStats[p.id] = { profile: p, total: 0, wins: 0 }
+  })
+
+  allResults?.forEach((r: any) => {
+    const isSolo = participantsPerMatch[r.match_id] === 1
+    if (isSolo) return // Skip solo plays
+
+    if (userStats[r.user_id]) {
+      userStats[r.user_id].total += 1
+      if (r.is_winner) userStats[r.user_id].wins += 1
+    }
+  })
+
+  // Sort: 1st by wins DESC, 2nd by total games ASC
+  const leaderboard = Object.values(userStats)
+    .sort((a, b) => b.wins - a.wins || a.total - b.total)
+    // Only show users with at least 1 game
+    .filter(stat => stat.total > 0)
 
   return (
     <>
@@ -29,10 +61,10 @@ export default async function RankingPage() {
 
       <div style={{ paddingBottom: '80px' }}>
         <section className="card">
-          {profiles && profiles.length > 0 ? (
+          {leaderboard && leaderboard.length > 0 ? (
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {profiles.map((p, idx) => (
-                <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: idx < profiles.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
+              {leaderboard.map((stat, idx) => (
+                <li key={stat.profile.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: idx < leaderboard.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ 
                       width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
@@ -43,20 +75,20 @@ export default async function RankingPage() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--border-color)', overflow: 'hidden' }}>
-                        {p.avatar_url ? (
-                          <img src={p.avatar_url} alt={p.display_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {stat.profile.avatar_url ? (
+                          <img src={stat.profile.avatar_url} alt={stat.profile.display_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                           <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>👤</div>
                         )}
                       </div>
-                      <Link href={`/users/${p.id}`} style={{ fontWeight: '600', color: 'var(--text-main)', textDecoration: 'none', fontSize: '16px' }}>
-                        {p.display_name} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>({p.username})</span>
+                      <Link href={`/users/${stat.profile.id}`} style={{ fontWeight: '600', color: 'var(--text-main)', textDecoration: 'none', fontSize: '16px' }}>
+                        {stat.profile.display_name} <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>({stat.profile.username})</span>
                       </Link>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 'bold', color: '#fbbf24', fontSize: '18px' }}>
-                      {(p.bodong || 0).toLocaleString()} <span style={{ fontSize: '14px', color: 'var(--text-main)' }}>보동</span>
+                    <div style={{ fontWeight: 'bold', color: 'var(--primary-color)', fontSize: '16px' }}>
+                      {stat.total}전 {stat.wins}승 {stat.total - stat.wins}패
                     </div>
                   </div>
                 </li>

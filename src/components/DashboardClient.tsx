@@ -2,39 +2,17 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { approveMatch, rejectMatch, deleteMatch, cancelMatch } from '@/app/matches/actions'
+import { deleteMatch } from '@/app/matches/actions'
 
-export default function DashboardClient({ games, matches, pendingMatches, allResults, myUserId, isMaster }: any) {
+export default function DashboardClient({ games, matches, allResults, myUserId, isMaster }: any) {
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null)
   const [showFullLeaderboard, setShowFullLeaderboard] = useState(false)
   const [isPending, startTransition] = useTransition()
-
-  const handleApprove = (matchId: string) => {
-    startTransition(async () => {
-      await approveMatch(matchId)
-    })
-  }
-
-  const handleReject = (matchId: string) => {
-    if (confirm('이 전적 등록을 거절하시겠습니까? 거절 시 전적 등록이 취소됩니다.')) {
-      startTransition(async () => {
-        await rejectMatch(matchId)
-      })
-    }
-  }
 
   const handleDelete = (matchId: string) => {
     if (confirm('정말 이 전적을 삭제하시겠습니까? 삭제 시 복구할 수 없습니다.')) {
       startTransition(async () => {
         await deleteMatch(matchId)
-      })
-    }
-  }
-
-  const handleCancel = (matchId: string) => {
-    if (confirm('내가 등록한 이 전적을 취소(삭제)하시겠습니까?')) {
-      startTransition(async () => {
-        await cancelMatch(matchId)
       })
     }
   }
@@ -67,7 +45,7 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
 
   // Calculate rate for all users first
   Object.values(userStats).forEach(stat => {
-    stat.rate = stat.total > 0 ? Math.round((stat.wins / stat.total) * 100) : 0;
+    stat.rate = stat.total > 0 ? Number(((stat.wins / stat.total) * 100).toFixed(1)) : 0;
   });
 
   const leaderboard = Object.values(userStats)
@@ -121,55 +99,13 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
         </div>
       </section>
 
-      {pendingMatches && pendingMatches.length > 0 && (
-        <section className="card" style={{ border: '2px solid var(--primary-color)' }}>
-          <h2 style={{ fontSize: '18px', marginBottom: '16px', color: 'var(--primary-color)' }}>🔔 승인 대기 중인 전적</h2>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {pendingMatches.map((m: any) => {
-              const myResult = m.match_results?.find((r: any) => r.user_id === myUserId)
-              const needsMyApproval = myResult && myResult.is_approved === false
-
-              return (
-              <li key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{new Date(m.date_played).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })} • {m.games?.title || '알 수 없는 게임'}</div>
-                  {m.creator_id === myUserId && (
-                    <button onClick={() => handleCancel(m.id)} disabled={isPending} style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: '12px', cursor: isPending ? 'wait' : 'pointer' }}>등록 취소</button>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {m.match_results?.map((r: any, i: number) => (
-                    <div key={i} style={{ padding: '6px 12px', borderRadius: '20px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--border-color)', fontSize: '14px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      {r.is_winner && '👑'} {r.team ? `[${r.team}팀] ` : ''}{r.profiles ? `${r.profiles.display_name}(${r.profiles.username})` : '알 수 없는 유저'} {r.score !== null && <span style={{ opacity: 0.7 }}>{r.score} 점</span>}
-                      {r.is_approved ? <span style={{ fontSize: '10px', color: 'var(--success)', marginLeft: '4px' }}>✓승인완료</span> : <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '4px' }}>⏳대기중</span>}
-                    </div>
-                  ))}
-                </div>
-                {needsMyApproval ? (
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                    <button onClick={() => handleApprove(m.id)} disabled={isPending} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: 'none', backgroundColor: 'var(--primary-color)', color: 'white', fontWeight: 'bold', cursor: isPending ? 'wait' : 'pointer' }}>수락</button>
-                    <button onClick={() => handleReject(m.id)} disabled={isPending} style={{ flex: 1, padding: '8px', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'transparent', color: 'var(--text-main)', cursor: isPending ? 'wait' : 'pointer' }}>거절</button>
-                  </div>
-                ) : (
-                  <div style={{ fontSize: '12px', color: 'var(--primary-color)', marginTop: '4px', textAlign: 'center', backgroundColor: 'rgba(99,102,241,0.1)', padding: '8px', borderRadius: '8px' }}>
-                    ⏳ 다른 참여자들의 승인을 기다리고 있습니다...
-                  </div>
-                )}
-              </li>
-              )
-            })}
-          </ul>
-        </section>
-      )}
-
       <section className="card">
         <h2 style={{ fontSize: '16px', color: 'var(--text-muted)' }}>내 승률 통계</h2>
         {myStats ? (
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center', marginTop: '12px' }}>
             <div style={{ fontSize: '40px', fontWeight: 'bold', color: 'var(--primary-color)' }}>{myStats.rate}<span style={{fontSize:'20px'}}>%</span></div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ fontSize: '14px' }}>총 {myStats.total}전</div>
-              <div style={{ fontSize: '14px', color: 'var(--success)' }}>{myStats.wins}승 {myStats.total - myStats.wins}패</div>
+              <div style={{ fontSize: '14px', color: 'var(--success)', fontWeight: 'bold' }}>{myStats.total}전 {myStats.wins}승 {myStats.total - myStats.wins}패</div>
             </div>
             <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>보유 포인트</div>
@@ -197,8 +133,8 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
                   <Link href={`/users/${stat.uid}`} style={{ fontWeight: '600', color: 'var(--text-main)', textDecoration: 'none' }}>{stat.name}</Link>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{stat.rate}%</div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.wins}승 {stat.total - stat.wins}패</div>
+                  <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{stat.rate.toFixed(1)}%</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.total}전 {stat.wins}승 {stat.total - stat.wins}패</div>
                 </div>
               </li>
             ))}
@@ -222,7 +158,7 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
                 <li key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{new Date(m.date_played).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })} • {m.games?.title || '알 수 없는 게임'} {isSolo && '(솔로 플레이)'}</div>
-                    {isMaster && (
+                    {m.match_results?.some((r: any) => r.user_id === myUserId) && (
                       <button onClick={() => handleDelete(m.id)} disabled={isPending} style={{ background: 'transparent', border: 'none', color: '#ef4444', fontSize: '12px', cursor: isPending ? 'wait' : 'pointer' }}>삭제</button>
                     )}
                   </div>
@@ -258,8 +194,8 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
                       <Link href={`/users/${stat.uid}`} style={{ fontWeight: '600', color: 'var(--text-main)', textDecoration: 'none' }}>{stat.name}</Link>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{stat.rate}%</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.wins}승 {stat.total - stat.wins}패</div>
+                      <div style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{stat.rate.toFixed(1)}%</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.total}전 {stat.wins}승 {stat.total - stat.wins}패</div>
                     </div>
                   </li>
                 ))}

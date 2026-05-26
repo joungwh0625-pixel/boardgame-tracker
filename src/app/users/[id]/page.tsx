@@ -51,7 +51,7 @@ export default async function UserProfilePage(props: { params: Promise<{ id: str
       }
     }
   })
-  const winRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0
+  const winRate = totalGames > 0 ? Number(((wins / totalGames) * 100).toFixed(1)) : 0
 
   return (
     <>
