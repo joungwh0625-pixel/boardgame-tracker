@@ -1,3 +1,5 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import ScrollToTop from "@/components/ScrollToTop";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
