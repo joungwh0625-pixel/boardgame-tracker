@@ -43,21 +43,28 @@ export async function recordMatch(formData: FormData) {
   
   const playersData = []
   for (let i = 1; i <= 20; i++) {
-    const user_id = formData.get(`player_${i}`) as string
+    let user_id = formData.get(`player_${i}`) as string | null
     if (!user_id) continue;
+    
+    let external_name = null;
+    if (user_id === 'external') {
+      user_id = null;
+      external_name = formData.get(`external_name_${i}`) as string;
+    }
     
     const scoreRaw = formData.get(`score_${i}`)
     const score = scoreRaw ? parseInt(scoreRaw as string) : null
     const is_winner = formData.get(`winner_${i}`) === 'true'
     const team = formData.get(`team_${i}`) as string || null
 
-    playersData.push({ user_id, score, is_winner, team })
+    playersData.push({ user_id, external_name, score, is_winner, team })
   }
 
   for (const p of playersData) {
     results.push({
       match_id: match.id,
       user_id: p.user_id,
+      external_name: p.external_name,
       score: p.score,
       is_winner: isSolo ? false : p.is_winner,
       team: p.team,
@@ -72,9 +79,9 @@ export async function recordMatch(formData: FormData) {
       redirect(encodeURI('/matches/new?message=결과 저장에 실패했습니다.'))
     }
     
-    // Multi-player인 경우 우승자에게 보동 포인트 즉시 지급
+    // Multi-player인 경우 우승자(가입된 유저)에게 보동 포인트 즉시 지급
     if (!isSolo) {
-      const winners = results.filter(r => r.is_winner)
+      const winners = results.filter(r => r.is_winner && r.user_id)
       for (const w of winners) {
         const { data: p } = await supabase.from('profiles').select('bodong').eq('id', w.user_id).single()
         await supabase.from('profiles').update({ bodong: (p?.bodong || 0) + 100 }).eq('id', w.user_id)

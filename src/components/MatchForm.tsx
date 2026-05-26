@@ -15,6 +15,7 @@ export default function MatchForm({ games, profiles, message }: { games: any[], 
   }
 
   const isPlayerSelectedByOther = (profileId: string, currentNum: number) => {
+    if (profileId === 'external') return false // 외부 유저는 중복 선택 허용
     for (const key in selectedPlayers) {
       if (parseInt(key) !== currentNum && selectedPlayers[key] === profileId) {
         return true
@@ -31,7 +32,7 @@ export default function MatchForm({ games, profiles, message }: { games: any[], 
 
   return (
     <div className="card">
-      <h1 style={{ fontSize: '20px', marginBottom: '24px' }}>새 기보 등록</h1>
+      <h1 style={{ fontSize: '20px', marginBottom: '24px' }}>전적 등록</h1>
       {message && (
         <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
           {message}
@@ -76,7 +77,19 @@ export default function MatchForm({ games, profiles, message }: { games: any[], 
                       {p.display_name}({p.username}) {isPlayerSelectedByOther(p.id, num) ? '(선택됨)' : ''}
                     </option>
                   ))}
+                  {num > 1 && (
+                    <option value="external">직접 입력 (외부 유저)</option>
+                  )}
                 </select>
+                {selectedPlayers[num] === 'external' && (
+                  <input 
+                    type="text" 
+                    name={`external_name_${num}`} 
+                    placeholder="유저 이름 입력" 
+                    required 
+                    style={{ marginTop: '8px' }}
+                  />
+                )}
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>

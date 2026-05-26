@@ -26,7 +26,7 @@ export default async function UserProfilePage(props: { params: Promise<{ id: str
         id, date_played, created_at,
         games(id, title),
         match_results(
-          score, is_winner, user_id, team,
+          score, is_winner, user_id, team, external_name,
           profiles(display_name, username)
         )
       `)
@@ -96,11 +96,24 @@ export default async function UserProfilePage(props: { params: Promise<{ id: str
                 <li key={m.id} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{m.date_played} • {m.games?.title || '알 수 없는 게임'} {isSolo && '(솔로 플레이)'}</div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {m.match_results?.map((r: any, i: number) => (
-                      <Link href={`/users/${r.user_id}`} key={i} style={{ padding: '6px 12px', borderRadius: '20px', backgroundColor: r.is_winner && !isSolo ? 'rgba(16, 185, 129, 0.1)' : 'var(--border-color)', border: `1px solid ${r.is_winner && !isSolo ? 'var(--success)' : (r.user_id === params.id ? 'var(--primary-color)' : 'transparent')}`, fontSize: '14px', color: r.is_winner && !isSolo ? 'var(--success)' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
-                        {r.is_winner && !isSolo && '👑'} {r.team ? `[${r.team}팀] ` : ''}{r.profiles ? `${r.profiles.display_name}(${r.profiles.username})` : '알 수 없는 유저'} {r.score !== null && <span style={{ opacity: 0.7 }}>{r.score} 점</span>}
-                      </Link>
-                    ))}
+                    {m.match_results?.map((r: any, i: number) => {
+                      const Content = (
+                        <>
+                          {r.is_winner && !isSolo && '👑'} {r.team ? `[${r.team}팀] ` : ''}{r.profiles ? `${r.profiles.display_name}(${r.profiles.username})` : (r.external_name ? `${r.external_name}(외부)` : '알 수 없는 유저')} {r.score !== null && <span style={{ opacity: 0.7 }}>{r.score} 점</span>}
+                        </>
+                      )
+                      const style = { padding: '6px 12px', borderRadius: '20px', backgroundColor: r.is_winner && !isSolo ? 'rgba(16, 185, 129, 0.1)' : 'var(--border-color)', border: `1px solid ${r.is_winner && !isSolo ? 'var(--success)' : (r.user_id === params.id ? 'var(--primary-color)' : 'transparent')}`, fontSize: '14px', color: r.is_winner && !isSolo ? 'var(--success)' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }
+                      
+                      return r.user_id ? (
+                        <Link href={`/users/${r.user_id}`} key={i} style={style}>
+                          {Content}
+                        </Link>
+                      ) : (
+                        <span key={i} style={style}>
+                          {Content}
+                        </span>
+                      )
+                    })}
                   </div>
                 </li>
               )

@@ -17,7 +17,7 @@ export default async function Home() {
     id, date_played, created_at,
     games(id, title),
     match_results(
-      score, is_winner, user_id, team,
+      score, is_winner, user_id, team, external_name,
       profiles(display_name, username)
     )
   `).eq('status', 'approved').order('date_played', { ascending: false }).order('created_at', { ascending: false }).limit(20)

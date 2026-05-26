@@ -33,7 +33,7 @@ export default function DashboardClient({ games, matches, allResults, myUserId, 
   const userStats: Record<string, { uid: string, name: string, total: number, wins: number, rate: number, bodong?: number }> = {}
   filteredResults.forEach((r: any) => {
     const isSolo = participantsPerMatch[r.match_id] === 1
-    if (isSolo) return // Skip solo plays
+    if (isSolo || !r.user_id) return // Skip solo plays and external users
 
     const uid = r.user_id
     if (!userStats[uid]) {
@@ -163,11 +163,24 @@ export default function DashboardClient({ games, matches, allResults, myUserId, 
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {m.match_results?.map((r: any, i: number) => (
-                      <Link href={`/users/${r.user_id}`} key={i} style={{ padding: '6px 12px', borderRadius: '20px', backgroundColor: r.is_winner && !isSolo ? 'rgba(16, 185, 129, 0.1)' : 'var(--border-color)', border: `1px solid ${r.is_winner && !isSolo ? 'var(--success)' : 'transparent'}`, fontSize: '14px', color: r.is_winner && !isSolo ? 'var(--success)' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}>
-                        {r.is_winner && !isSolo && '👑'} {r.team ? `[${r.team}팀] ` : ''}{r.profiles ? `${r.profiles.display_name}(${r.profiles.username})` : '알 수 없는 유저'} {r.score !== null && <span style={{ opacity: 0.7 }}>{r.score} 점</span>}
-                      </Link>
-                    ))}
+                    {m.match_results?.map((r: any, i: number) => {
+                      const Content = (
+                        <>
+                          {r.is_winner && !isSolo && '👑'} {r.team ? `[${r.team}팀] ` : ''}{r.profiles ? `${r.profiles.display_name}(${r.profiles.username})` : (r.external_name ? `${r.external_name}(외부)` : '알 수 없는 유저')} {r.score !== null && <span style={{ opacity: 0.7 }}>{r.score} 점</span>}
+                        </>
+                      )
+                      const style = { padding: '6px 12px', borderRadius: '20px', backgroundColor: r.is_winner && !isSolo ? 'rgba(16, 185, 129, 0.1)' : 'var(--border-color)', border: `1px solid ${r.is_winner && !isSolo ? 'var(--success)' : 'transparent'}`, fontSize: '14px', color: r.is_winner && !isSolo ? 'var(--success)' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }
+                      
+                      return r.user_id ? (
+                        <Link href={`/users/${r.user_id}`} key={i} style={style}>
+                          {Content}
+                        </Link>
+                      ) : (
+                        <span key={i} style={style}>
+                          {Content}
+                        </span>
+                      )
+                    })}
                   </div>
                 </li>
               )
