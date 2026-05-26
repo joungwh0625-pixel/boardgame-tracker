@@ -9,10 +9,6 @@ export default async function EditGamePage({ params }: { params: Promise<{ id: s
   const { data: user, error: userError } = await supabase.auth.getUser()
   if (userError || !user?.user) redirect('/login')
 
-  // Check if master
-  const { data: profile } = await supabase.from('profiles').select('is_master').eq('id', user.user.id).single()
-  if (!profile?.is_master) redirect('/') // Only masters can edit
-
   const { data: game, error } = await supabase.from('games').select('*').eq('id', id).single()
   
   if (error || !game) redirect('/games/new')

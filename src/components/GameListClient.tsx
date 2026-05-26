@@ -39,15 +39,13 @@ export default function GameListClient({ games, isMaster }: { games: any[], isMa
                 <div style={{ fontWeight: 'bold', fontSize: '16px' }}>{g.title}</div>
                 {g.description && <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>{g.description}</div>}
               </div>
-              {isMaster && (
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <Link href={`/games/${g.id}/edit`} style={{ padding: '6px 12px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '12px', textDecoration: 'none' }}>수정</Link>
-                  <form action={deleteGame}>
-                    <input type="hidden" name="game_id" value={g.id} />
-                    <DeleteGameButton />
-                  </form>
-                </div>
-              )}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Link href={`/games/${g.id}/edit`} style={{ padding: '6px 12px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '12px', textDecoration: 'none' }}>수정</Link>
+                <form action={deleteGame}>
+                  <input type="hidden" name="game_id" value={g.id} />
+                  <DeleteGameButton />
+                </form>
+              </div>
             </li>
           ))}
         </ul>

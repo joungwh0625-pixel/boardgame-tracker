@@ -16,9 +16,6 @@ export async function updateGame(formData: FormData) {
   const { data: user } = await supabase.auth.getUser()
   if (!user?.user) return redirect('/login')
 
-  const { data: profile } = await supabase.from('profiles').select('is_master').eq('id', user.user.id).single()
-  if (!profile?.is_master) return redirect('/')
-
   let updates: any = {
     title,
     description
