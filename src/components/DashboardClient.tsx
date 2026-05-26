@@ -53,11 +53,13 @@ export default function DashboardClient({ games, matches, allResults, myUserId, 
 
   const myStats = userStats[myUserId]
 
-  // Filter recent matches
   const filteredMatches = matches.filter((m: any) => {
     if (selectedGameId && m.games?.id !== selectedGameId) return false
     return true
   })
+
+  const selectedGameName = selectedGameId ? games?.find((g: any) => g.id === selectedGameId)?.title : null;
+  const leaderboardTitle = selectedGameName ? `실시간 ${selectedGameName} 전적` : '실시간 전체 전적';
 
   return (
     <>
@@ -119,7 +121,7 @@ export default function DashboardClient({ games, matches, allResults, myUserId, 
 
       <section className="card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h2 style={{ fontSize: '18px', margin: 0 }}>🏆 명예의 전당</h2>
+          <h2 style={{ fontSize: '18px', margin: 0 }}>🏆 {leaderboardTitle}</h2>
           {leaderboard.length > 3 && (
             <button onClick={() => setShowFullLeaderboard(true)} style={{ background: 'transparent', border: 'none', color: 'var(--primary-color)', fontSize: '14px', cursor: 'pointer', fontWeight: 'bold' }}>전체보기</button>
           )}
@@ -195,7 +197,7 @@ export default function DashboardClient({ games, matches, allResults, myUserId, 
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 100, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
           <div className="card" style={{ width: '100%', maxWidth: '400px', maxHeight: '80vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
             <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '18px', margin: 0 }}>🏆 명예의 전당 (전체)</h2>
+              <h2 style={{ fontSize: '18px', margin: 0 }}>🏆 {leaderboardTitle} (순위)</h2>
               <button onClick={() => setShowFullLeaderboard(false)} style={{ background: 'transparent', border: 'none', fontSize: '24px', cursor: 'pointer', color: 'var(--text-main)', lineHeight: 1 }}>&times;</button>
             </div>
             <div style={{ overflowY: 'auto', padding: '20px' }}>
