@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import ScrollToTop from "@/components/ScrollToTop";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   title: "Board Game Tracker",
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <ServiceWorkerRegister />
         <div className="app-container">
           <div className="content-area">
             {children}
