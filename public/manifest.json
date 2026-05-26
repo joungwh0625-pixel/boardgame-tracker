@@ -1,0 +1,17 @@
+{
+  "name": "Board Game Tracker",
+  "short_name": "BG Tracker",
+  "description": "보드게임 전적 및 통계 트래커",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
