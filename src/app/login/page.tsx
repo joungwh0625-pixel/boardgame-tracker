@@ -1,5 +1,6 @@
 import { login } from './actions'
 import Link from 'next/link'
+import SocialLogins from '@/components/SocialLogins'
 
 export default async function LoginPage(props: { searchParams: Promise<{ message: string }> }) {
   const searchParams = await props.searchParams;
@@ -22,9 +23,12 @@ export default async function LoginPage(props: { searchParams: Promise<{ message
             <label htmlFor="password">비밀번호</label>
             <input id="password" name="password" type="password" required />
           </div>
-          <button className="btn btn-primary" type="submit" style={{ marginBottom: '16px' }}>로그인</button>
+          <button className="btn btn-primary" type="submit" style={{ marginBottom: '16px' }}>이메일로 로그인</button>
         </form>
-        <div style={{ textAlign: 'center', fontSize: '14px' }}>
+
+        <SocialLogins />
+        
+        <div style={{ textAlign: 'center', fontSize: '14px', marginTop: '24px' }}>
           <span style={{ color: 'var(--text-muted)' }}>계정이 없으신가요? </span>
           <Link href="/signup" style={{ color: 'var(--primary-color)', textDecoration: 'none', fontWeight: 'bold' }}>회원가입</Link>
         </div>
