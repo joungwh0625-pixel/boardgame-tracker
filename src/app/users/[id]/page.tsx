@@ -19,7 +19,7 @@ export default async function UserProfilePage(props: { params: Promise<{ id: str
 
   const matchIds = matchResults?.map(mr => mr.match_id) || []
 
-  let matches = []
+  let matches: any[] = []
   if (matchIds.length > 0) {
     const { data } = await supabase.from('matches')
       .select(`

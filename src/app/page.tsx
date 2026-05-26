@@ -37,7 +37,7 @@ export default async function Home() {
   // Since the inner join limits the results array to ONLY the current user's result, 
   // we actually need to fetch the full match_results for these match IDs to display all participants.
   const pendingMatchIds = pendingMatches?.map(m => m.id) || []
-  let fullPendingMatches = []
+  let fullPendingMatches: any[] = []
   
   if (pendingMatchIds.length > 0) {
     const { data: fullMatches } = await supabase.from('matches').select(`

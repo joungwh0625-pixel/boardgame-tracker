@@ -52,7 +52,7 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
   })
 
   // Calculate stats (exclude solo plays for win rate)
-  const userStats: Record<string, { name: string, total: number, wins: number, rate: number }> = {}
+  const userStats: Record<string, { uid: string, name: string, total: number, wins: number, rate: number, bodong?: number }> = {}
   filteredResults.forEach((r: any) => {
     const isSolo = participantsPerMatch[r.match_id] === 1
     if (isSolo) return // Skip solo plays
@@ -173,7 +173,7 @@ export default function DashboardClient({ games, matches, pendingMatches, allRes
             </div>
             <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
               <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>보유 포인트</div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#fbbf24' }}>{myStats.bodong.toLocaleString()} 보동</div>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#fbbf24' }}>{(myStats.bodong || 0).toLocaleString()} 보동</div>
             </div>
           </div>
         ) : (
