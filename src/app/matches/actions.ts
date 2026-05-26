@@ -27,7 +27,7 @@ export async function approveMatch(matchId: string) {
       .eq('id', matchId)
 
     // Check if multi-player
-    if (results.length > 1) {
+    if (results && results.length > 1) {
       // Get winners
       const { data: winners } = await supabase.from('match_results').select('user_id').eq('match_id', matchId).eq('is_winner', true)
       
